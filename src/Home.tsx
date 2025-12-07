@@ -16,6 +16,8 @@ import {
 
 import { Link } from "react-router-dom";
 import Button from "@mui/material/Button";
+import Register from './register/register';
+
 
 function Home() {
   return (
@@ -31,8 +33,8 @@ function Home() {
             mantén tu información actualizada desde cualquier lugar.
           </p>
           <div className="flex gap-4 justify-center flex-wrap">
-            <Button>Comenzar Ahora</Button>
-            <Button>Ya tengo cuenta</Button>
+            <Button><Link to="/register">Comenzar</Link></Button>
+            <Button></Button>
           </div>
         </div>
 

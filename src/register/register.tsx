@@ -19,9 +19,71 @@ import { Alert, AlertDescription } from "../components/ui/alert";
 import { Input } from "../components/ui/input";
 import { Label } from "../components/ui/label";
 import Button from "@mui/material/Button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { registerUser } from "../lib/user-service";
+import { useState } from "react";
 
 function register() {
+
+  const navigate=useNavigate();
+
+  const [formData, setFormData] = useState({
+    name: "",
+    curp: "",
+    number1: "",
+    number2: "",
+    dateOfBirth: "",
+    address: "",
+    emergencyContact1: "",
+    emergencyContact2: ""
+  });
+
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  ///
+   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value =
+      e.target.name === "curp" || e.target.name === "fileNumber" ? e.target.value.toUpperCase() : e.target.value
+
+    setFormData((prev) => ({
+      ...prev,
+      [e.target.name]: value,
+    }))
+  }
+
+
+  ///
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+
+    if (formData.curp.length !== 18) {
+      setError("El CURP debe tener 18 caracteres");
+      return;
+    }
+
+    
+
+    setLoading(true);
+
+    try {
+      const success = await registerUser(formData);
+
+      if (success) {
+        navigate("/dashboard");
+        
+      } else {
+        setError("Este CURP o número de expediente ya está registrado");
+      }
+    } catch (err) {
+      setError("Ha ocurrido un error. Por favor, inténtalo de nuevo.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  ///////////////////////////777
   return (
     <div className="min-h-screen bg-gradient-to-b from-secondary to-background py-8 px-4">
       <div className="w-full max-w-2xl mx-auto">
@@ -49,14 +111,14 @@ function register() {
                 </Alert>
               )}
 
-              <div className="grid md:grid-cols-2 gap-4">
+              <div className="">
                 <div className="space-y-2">
                   <Label htmlFor="curp">CURP *</Label>
                   <Input
                     id="curp"
                     name="curp"
                     type="text"
-                    placeholder="PERJ850515HDFXXX01"
+                    placeholder="DAGE691207MDFRRL09"
                     value={formData.curp}
                     onChange={handleChange}
                     required
@@ -65,24 +127,6 @@ function register() {
                     className="uppercase"
                   />
                   <p className="text-xs text-muted-foreground">18 caracteres</p>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="fileNumber">Número de Expediente *</Label>
-                  <Input
-                    id="fileNumber"
-                    name="fileNumber"
-                    type="text"
-                    placeholder="EXP-2024-001"
-                    value={formData.fileNumber}
-                    onChange={handleChange}
-                    required
-                    disabled={loading}
-                    className="uppercase"
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Proporcionado por el hospital
-                  </p>
                 </div>
               </div>
 
@@ -108,7 +152,7 @@ function register() {
                     name="phone"
                     type="tel"
                     placeholder="+52 55 1234 5678"
-                    value={formData.phone}
+                    value={formData.number1}
                     onChange={handleChange}
                     required
                     disabled={loading}
@@ -145,14 +189,29 @@ function register() {
 
               <div className="space-y-2">
                 <Label htmlFor="emergencyContact">
-                  Contacto de Emergencia *
+                  Contacto de Emergencia 1*
                 </Label>
                 <Input
                   id="emergencyContact"
                   name="emergencyContact"
                   type="tel"
                   placeholder="+52 55 8765 4321"
-                  value={formData.emergencyContact}
+                  value={formData.emergencyContact1}
+                  onChange={handleChange}
+                  required
+                  disabled={loading}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="emergencyContact">
+                  Contacto de Emergencia 2*
+                </Label>
+                <Input
+                  id="emergencyContact"
+                  name="emergencyContact"
+                  type="tel"
+                  placeholder="+52 55 4017 4321"
+                  value={formData.emergencyContact2}
                   onChange={handleChange}
                   required
                   disabled={loading}
@@ -175,7 +234,10 @@ function register() {
           <CardFooter className="flex flex-col gap-2">
             <div className="text-sm text-muted-foreground text-center">
               ¿Ya tienes una cuenta?{" "}
-              <Link to="/login" className="text-primary hover:underline font-medium">
+              <Link
+                to="/login"
+                className="text-primary hover:underline font-medium"
+              >
                 Inicia sesión aquí
               </Link>
             </div>
@@ -183,7 +245,10 @@ function register() {
         </Card>
 
         <div className="mt-6 text-center">
-          <Link to="/" className="text-sm text-muted-foreground hover:text-foreground">
+          <Link
+            to="/"
+            className="text-sm text-muted-foreground hover:text-foreground"
+          >
             ← Volver al inicio
           </Link>
         </div>
