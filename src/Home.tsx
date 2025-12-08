@@ -93,7 +93,7 @@ function Home() {
               disponibles. Solo necesitas tu correo electrónico y algunos datos
               básicos.
             </p>
-            <Button>Crear Cuenta Gratuita</Button>
+            <Button><Link to="/register">Cear Cuenta</Link></Button>
           </CardContent>
         </Card>
       </main>
