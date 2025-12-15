@@ -1,16 +1,29 @@
 {
   "files": [],
   "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
-  ]
-  
-  ,"compilerOptions": {
+    {
+      "path": "./tsconfig.app.json"
+    },
+    {
+      "path": "./tsconfig.node.json"
+    }
+  ],
+  "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
-    }
+      "@/*": [
+        "src/*"
+      ]
+    },
+    "jsx": "react-jsx",
+    "types": [
+      "react"
+    ],
+    "lib": [
+      "dom",
+      "esnext"
+    ],
+    "verbatimModuleSyntax": true,
+    "jsxImportSource": "react"
   }
-
-
 }
