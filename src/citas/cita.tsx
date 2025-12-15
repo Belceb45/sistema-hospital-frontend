@@ -30,13 +30,12 @@ export interface AppointmentUI {
   hora: string
   location: string
   status: AppointmentStatus
-  doctorId: string // Guardamos el ID real para referencias
+  doctorId: string 
 }
 
 export default function Citas() {
   const { user, loading: userLoading } = useUser()
   const navigate = useNavigate()
-  // Ya no dependemos SOLO del doctor del contexto para pintar las tarjetas
   const { setDoctor } = useDoctor(); 
   
   const [appointments, setAppointments] = useState<AppointmentUI[]>([])
@@ -48,7 +47,6 @@ export default function Citas() {
   const [selectedAppointment, setSelectedAppointment] = useState<string | null>(null)
   const [processing, setProcessing] = useState(false) 
 
-  // Cache simple para no pedir el mismo doctor 10 veces
   const [doctorsCache, setDoctorsCache] = useState<Record<string, { nombre: string, especialidad: string }>>({});
 
   const cargarCitas = useCallback(async () => {
@@ -57,10 +55,8 @@ export default function Citas() {
     try {
       const data = await fetchCitasPaciente(user.id);
       
-      // 1. Identificar IDs de doctores únicos en las citas
       const doctorIds = Array.from(new Set(data.map(c => c.doctor)));
       
-      // 2. Buscar datos de doctores que no tengamos en caché
       const nuevosDoctores: Record<string, { nombre: string, especialidad: string }> = { ...doctorsCache };
       
       await Promise.all(doctorIds.map(async (docId) => {
@@ -72,7 +68,6 @@ export default function Citas() {
                       especialidad: docInfo.especialidad 
                   };
               } catch (e) {
-                  console.error("Error cargando doctor", docId);
                   nuevosDoctores[docId] = { nombre: "Desconocido", especialidad: "General" };
               }
           }
@@ -80,7 +75,6 @@ export default function Citas() {
       
       setDoctorsCache(nuevosDoctores);
 
-      // 3. Mapear citas con la info real del doctor
       const citasUI: AppointmentUI[] = data.map(cita => {
         let statusUI: AppointmentStatus = "scheduled";
         const estadoBackend = cita.estado ? cita.estado.toLowerCase() : "";
@@ -109,7 +103,6 @@ export default function Citas() {
         };
       });
       
-      // Filtramos SOLO las programadas
       const soloProgramadas = citasUI.filter(c => c.status === "scheduled");
       soloProgramadas.sort((a, b) => new Date(a.fecha).getTime() - new Date(b.fecha).getTime());
       
@@ -120,13 +113,13 @@ export default function Citas() {
     } finally {
       setLoadingData(false);
     }
-  }, [user, doctorsCache]); // Dependencia del caché para no buclear infinitamente si cambia
+  }, [user, doctorsCache]); 
 
   useEffect(() => {
     if (!userLoading && user) {
       cargarCitas();
     }
-  }, [user, userLoading]); // Quitamos cargarCitas de deps para evitar loop si no usamos useCallback correctamente con caché
+  }, [user, userLoading]);
 
   // --- LÓGICA DE CANCELACIÓN ---
   const handleCancelClick = (id: string) => {
@@ -134,8 +127,26 @@ export default function Citas() {
     setCancelDialogOpen(true)
   }
 
-  const handleReagendarClick = (id: string) => {
-    navigate("/citas/nueva", { state: { idCitaParaReagendar: id } });
+  // --- NUEVA LÓGICA DE REAGENDAR CON RESTRICCIÓN DE 2 HORAS ---
+  const handleReagendarClick = (appointment: AppointmentUI) => {
+    const fechaCita = new Date(appointment.fecha); // "YYYY-MM-DDTHH:MM"
+    const ahora = new Date();
+
+    // Calculamos la diferencia en milisegundos
+    const diferenciaMs = fechaCita.getTime() - ahora.getTime();
+    
+    // Convertimos a horas (ms / 1000 / 60 / 60)
+    const horasRestantes = diferenciaMs / (1000 * 60 * 60);
+
+    // Verificamos si faltan menos de 2 horas
+    if (horasRestantes < 2) {
+      
+        alert("\n\nSolo se permiten cambios con al menos 2 horas de anticipación a la cita.");
+        return;
+    }
+
+    // Si pasa la validación, navegamos
+    navigate("/citas/nueva", { state: { idCitaParaReagendar: appointment.id } });
   }
 
   const handleConfirmCancel = async () => {
@@ -157,7 +168,6 @@ export default function Citas() {
     }
   }
 
-  // --- LÓGICA DE CAMBIO DE DOCTOR ---
   const handleChangeDoctorClick = () => {
     setChangeDoctorDialogOpen(true);
   }
@@ -190,77 +200,91 @@ export default function Citas() {
     }
   }
 
-  const AppointmentCard = ({ appointment }: { appointment: AppointmentUI }) => (
-    <Card className="hover:shadow-md transition-shadow mb-4 border-l-4 border-l-primary animate-in fade-in zoom-in duration-300 bg-white">
-      <CardContent className="p-6">
-        <div className="flex flex-col md:flex-row gap-4">
-          {/* Fecha */}
-          <div className="flex flex-col items-center justify-center bg-blue-50 text-blue-700 rounded-lg px-4 py-3 min-w-[90px] h-fit border border-blue-100">
-            <span className="text-3xl font-bold">{new Date(appointment.fecha).getDate()}</span>
-            <span className="text-xs font-bold uppercase tracking-wide">
-              {new Date(appointment.fecha).toLocaleDateString("es-ES", { month: "short" })}
-            </span>
-            <span className="text-xs text-blue-400">{new Date(appointment.fecha).getFullYear()}</span>
-          </div>
-
-          <div className="flex-1 min-w-0">
-            <div className="flex flex-col md:flex-row md:items-start justify-between gap-2 mb-2">
-              <div>
-                <h3 className="font-bold text-lg flex items-center gap-2 text-slate-800">
-                    <Stethoscope size={18} className="text-primary"/>
-                    Dr. {appointment.doctor}
-                </h3>
-                <span className={`inline-block text-xs px-2.5 py-1 rounded-full mt-1 font-medium border 
-                    ${appointment.especialidad === 'Medicina General' 
-                        ? 'bg-slate-100 text-slate-600 border-slate-200' 
-                        : 'bg-purple-50 text-purple-700 border-purple-200'}`}>
-                  {appointment.especialidad}
+  const AppointmentCard = ({ appointment }: { appointment: AppointmentUI }) => {
+    
+    // Calculamos visualmente si es posible reagendar para deshabilitar el botón (Opcional, pero recomendado UX)
+    const esReagendable = () => {
+        const fechaCita = new Date(appointment.fecha);
+        const ahora = new Date();
+        const diffHoras = (fechaCita.getTime() - ahora.getTime()) / (1000 * 60 * 60);
+        return diffHoras >= 2;
+    };
+    
+    return (
+        <Card className="hover:shadow-md transition-shadow mb-4 border-l-4 border-l-primary animate-in fade-in zoom-in duration-300 bg-white">
+        <CardContent className="p-6">
+            <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex flex-col items-center justify-center bg-blue-50 text-blue-700 rounded-lg px-4 py-3 min-w-[90px] h-fit border border-blue-100">
+                <span className="text-3xl font-bold">{new Date(appointment.fecha).getDate()}</span>
+                <span className="text-xs font-bold uppercase tracking-wide">
+                {new Date(appointment.fecha).toLocaleDateString("es-ES", { month: "short" })}
                 </span>
-              </div>
-              
-              <div className="px-3 py-1 rounded-full text-xs font-bold text-center w-fit bg-green-100 text-green-700 border border-green-200">
-                Programada
-              </div>
+                <span className="text-xs text-blue-400">{new Date(appointment.fecha).getFullYear()}</span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-slate-600 mt-4">
-              <p className="flex items-center gap-2 bg-slate-50 p-2 rounded">
-                <Clock className="h-4 w-4 text-slate-400" />
-                <span>Hora: <strong className="text-slate-800">{appointment.hora.substring(0, 5)} hrs</strong></span>
-              </p>
-              <p className="flex items-center gap-2 bg-slate-50 p-2 rounded">
-                <MapPin className="h-4 w-4 text-slate-400" />
-                <span>{appointment.location}</span>
-              </p>
-            </div>
+            <div className="flex-1 min-w-0">
+                <div className="flex flex-col md:flex-row md:items-start justify-between gap-2 mb-2">
+                <div>
+                    <h3 className="font-bold text-lg flex items-center gap-2 text-slate-800">
+                        <Stethoscope size={18} className="text-primary"/>
+                        Dr. {appointment.doctor}
+                    </h3>
+                    <span className={`inline-block text-xs px-2.5 py-1 rounded-full mt-1 font-medium border 
+                        ${appointment.especialidad === 'Medicina General' 
+                            ? 'bg-slate-100 text-slate-600 border-slate-200' 
+                            : 'bg-purple-50 text-purple-700 border-purple-200'}`}>
+                    {appointment.especialidad}
+                    </span>
+                </div>
+                
+                <div className="px-3 py-1 rounded-full text-xs font-bold text-center w-fit bg-green-100 text-green-700 border border-green-200">
+                    Programada
+                </div>
+                </div>
 
-            <div className="mt-5 flex flex-wrap justify-end gap-3 pt-4 border-t border-slate-100">
-                <Button 
-                    variant="contained" 
-                    size="small" 
-                    onClick={() => handleReagendarClick(appointment.id)}
-                    startIcon={<Edit className="h-4 w-4" />}
-                    sx={{ textTransform: 'none', boxShadow: 'none' }}
-                >
-                  Reagendar
-                </Button>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-slate-600 mt-4">
+                <p className="flex items-center gap-2 bg-slate-50 p-2 rounded">
+                    <Clock className="h-4 w-4 text-slate-400" />
+                    <span>Hora: <strong className="text-slate-800">{appointment.hora.substring(0, 5)} hrs</strong></span>
+                </p>
+                <p className="flex items-center gap-2 bg-slate-50 p-2 rounded">
+                    <MapPin className="h-4 w-4 text-slate-400" />
+                    <span>{appointment.location}</span>
+                </p>
+                </div>
 
-                <Button 
-                    variant="outlined" 
-                    color="error" 
-                    size="small" 
-                    onClick={() => handleCancelClick(appointment.id)}
-                    startIcon={<X className="h-4 w-4" />}
-                    sx={{ textTransform: 'none' }}
-                >
-                  Cancelar
-                </Button>
+                <div className="mt-5 flex flex-wrap justify-end gap-3 pt-4 border-t border-slate-100">
+                    <Button 
+                        variant="contained" 
+                        size="small" 
+                        // Pasamos todo el objeto appointment
+                        onClick={() => handleReagendarClick(appointment)}
+                        startIcon={<Edit className="h-4 w-4" />}
+                        // Opcional: Cambiar estilo si ya no se puede reagendar
+                        disabled={!esReagendable()} 
+                        sx={{ textTransform: 'none', boxShadow: 'none' }}
+                        title={!esReagendable() ? "Solo se puede reagendar con 2 horas de anticipación" : ""}
+                    >
+                    Reagendar
+                    </Button>
+
+                    <Button 
+                        variant="outlined" 
+                        color="error" 
+                        size="small" 
+                        onClick={() => handleCancelClick(appointment.id)}
+                        startIcon={<X className="h-4 w-4" />}
+                        sx={{ textTransform: 'none' }}
+                    >
+                    Cancelar
+                    </Button>
+                </div>
             </div>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  )
+            </div>
+        </CardContent>
+        </Card>
+    )
+  }
 
   if (userLoading || loadingData) {
     return (
