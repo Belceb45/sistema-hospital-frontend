@@ -110,6 +110,12 @@ export default function NavbarLog() {
               Mis Citas
             </Button>
           </Link>
+
+          <Link to="/resultados">
+            <Button variant="text" sx={getButtonStyle('/citas')} startIcon={<Calendar size={18} />}>
+              Resultados
+            </Button>
+          </Link>
         </nav>
 
         <div className="flex items-center gap-3 md:gap-4 ml-4">

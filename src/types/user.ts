@@ -11,6 +11,6 @@ export interface User {
     telefono3?: string;
     fechaNacimiento: string;
     doctor_id: string;
-
+    afiliado:boolean;
   
 }

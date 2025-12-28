@@ -3,7 +3,7 @@ import NavbarLog from "../components/NavbarLog";
 import Button from "@mui/material/Button";
 import { useUser } from "../lib/user-context";
 import { Link } from "react-router-dom";
-import { fetchCitasPaciente, fetchDoctorAsignado } from "../lib/citas-service"; // Importamos fetchDoctor
+import { fetchCitasPaciente, fetchDoctorAsignado } from "../lib/citas-service"; 
 import type { Cita } from "../types/cita";
 import { useDoctor } from "../lib/doctor-context";
 
@@ -15,7 +15,7 @@ import {
   CardContent,
 } from "../components/ui/card";
 
-// Iconos
+// Iconos (Agregamos FileText)
 import { 
   Calendar, 
   User, 
@@ -24,7 +24,8 @@ import {
   Activity, 
   Stethoscope, 
   ArrowRight,
-  Map 
+  Map,
+  FileText // <--- IMPORTADO
 } from "lucide-react";
 
 // Tipo auxiliar extendido para la UI
@@ -35,7 +36,7 @@ interface CitaExtendida extends Cita {
 
 function Board() {
   const { user } = useUser();
-  const { doctor } = useDoctor(); // Doctor de cabecera (Contexto)
+  const { doctor } = useDoctor(); 
 
   const [citas, setCitas] = useState<CitaExtendida[]>([]);
   const [loading, setLoading] = useState(true);
@@ -57,10 +58,8 @@ function Board() {
           });
 
           // ENRIQUECER CON DATOS DEL DOCTOR ESPECÍFICO
-          // 1. IDs únicos
           const uniqueDocIds = Array.from(new Set(citasActivas.map(c => c.doctor)));
           
-          // 2. Fetch de doctores
           const docsMap: Record<string, {nombre: string, especialidad: string}> = {};
           
           await Promise.all(uniqueDocIds.map(async (docId) => {
@@ -74,7 +73,6 @@ function Board() {
               }
           }));
 
-          // 3. Unir datos
           const citasEnriquecidas = citasActivas.map(c => ({
               ...c,
               doctorNombre: docsMap[c.doctor]?.nombre || "Desconocido",
@@ -116,14 +114,14 @@ function Board() {
                 Bienvenido a tu panel de salud personal.
               </p>
             </div>
-            {/* Tarjeta del Médico de Cabecera (Contexto) */}
+           
             {doctor && (
                 <div className="hidden md:flex bg-background/50 backdrop-blur-sm p-3 rounded-2xl border border-border shadow-sm items-center gap-4">
                     <div className="bg-blue-100 p-2 rounded-full text-blue-700">
                         <Stethoscope size={24} />
                     </div>
                     <div>
-                        <p className="text-xs text-muted-foreground font-medium uppercase">Médico de Cabecera</p>
+                        <p className="text-xs text-muted-foreground font-medium uppercase">Médico de General</p>
                         <p className="text-sm font-bold text-foreground">Dr. {doctor.nombre}</p>
                     </div>
                 </div>
@@ -138,7 +136,7 @@ function Board() {
           {/* COLUMNA IZQUIERDA (2/3) */}
           <div className="lg:col-span-2 space-y-8">
             
-            {/* 1. SECCIÓN AGENDA MÉDICA */}
+          
             <div className="space-y-4">
                 <div className="flex items-center justify-between">
                     <h2 className="text-xl font-bold flex items-center gap-2">
@@ -183,7 +181,6 @@ function Board() {
                                         </span>
                                     </div>
                                     
-                                    {/* Mostrar Doctor ESPECÍFICO de la cita, no del contexto */}
                                     <h4 className="font-bold text-lg text-foreground group-hover:text-primary transition-colors">
                                         Dr. {cita.doctorNombre}
                                     </h4>
@@ -234,7 +231,7 @@ function Board() {
                 </Card>
             </div>
 
-            {/* 2. UBICACIÓN */}
+    
             <div className="space-y-4">
                 <h2 className="text-xl font-bold flex items-center gap-2">
                     <Map className="text-primary h-5 w-5" />
@@ -277,7 +274,6 @@ function Board() {
 
           </div>
 
-          {/* COLUMNA DERECHA */}
           <div className="space-y-6">
             <h2 className="text-xl font-bold text-foreground">Acciones Rápidas</h2>
             <div className="grid grid-cols-2 lg:grid-cols-1 gap-4">
@@ -310,7 +306,7 @@ function Board() {
                 </Link>
             </div>
 
-            {/* Resumen */}
+
             <Card className="bg-sidebar text-sidebar-foreground border-sidebar-border shadow-md overflow-hidden relative">
                 <CardHeader className="pb-2">
                     <CardTitle className="text-lg flex items-center gap-2">
@@ -341,6 +337,33 @@ function Board() {
                 </CardContent>
                 <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-primary/5 rounded-full blur-2xl"></div>
             </Card>
+
+          
+            <Link to="/resultados" className="block group">
+                <Card className="bg-white border-2 border-border/50 hover:border-blue-500/50 hover:shadow-md transition-all duration-300 overflow-hidden relative">
+                    <CardHeader className="pb-2">
+                         <CardTitle className="text-lg flex items-center gap-2 text-foreground">
+                            <FileText className="h-5 w-5 text-blue-600" />
+                            Resultados
+                        </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-sm text-foreground font-medium group-hover:text-blue-600 transition-colors">
+                                    Estudios de Laboratorio
+                                </p>
+                                <p className="text-xs text-muted-foreground mt-1">
+                                    Consulta y descarga tus reportes en PDF.
+                                </p>
+                            </div>
+                            <div className="bg-blue-50 p-3 rounded-xl group-hover:bg-blue-600 group-hover:text-white transition-all duration-300">
+                                <ArrowRight size={20} className="text-blue-600 group-hover:text-white" />
+                            </div>
+                        </div>
+                    </CardContent>
+                </Card>
+            </Link>
 
           </div>
         </div>

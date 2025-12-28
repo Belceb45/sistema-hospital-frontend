@@ -18,14 +18,27 @@ import {
 
 import { Link } from "react-router-dom";
 import Button from "@mui/material/Button";
-
-
+import Snowfall from 'react-snowfall'
 import logoEscom from "../public/logoEscom.png"; 
 
 function Home() {
   return (
-    <div className="min-h-screen bg-background font-sans flex flex-col">
+      <div className="min-h-screen bg-background font-sans flex flex-col">
+      <Snowfall 
+            color="#82C3D9"
+            snowflakeCount={150} //Cantidad de nieve
+            style={{
+                position: 'fixed',
+                width: '100vw',
+                height: '100vh',
+                zIndex: 9999, //Por encima de todo
+                top: 0,
+                left: 0,
+                pointerEvents: 'none' // Para que puedas dar clic a los botones debajo de la nieve
+            }}
+        />
       <Navbar />
+    
 
       <main className="flex-1">
         

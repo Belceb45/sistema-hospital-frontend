@@ -1,6 +1,6 @@
 import type React from "react"
 import { useEffect, useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, Link } from "react-router-dom"
 
 import {
     Card,
@@ -8,7 +8,6 @@ import {
     CardTitle,
     CardContent,
     CardDescription,
-    CardFooter,
 } from "../components/ui/card";
 
 import {
@@ -24,7 +23,12 @@ import {
     Save,
     X,
     ShieldCheck,
-    Stethoscope
+    Stethoscope,
+    Shield,
+    ClipboardList,
+    ChevronRight,
+    Download, // Icono para descargar
+    ExternalLink
 } from "lucide-react"
 
 import { Input } from "../components/ui/input";
@@ -34,6 +38,7 @@ import { Alert, AlertDescription } from "../components/ui/alert";
 import { useUser } from "../lib/user-context";
 import NavbarLog from "../components/NavbarLog";
 import { updateUser } from "../lib/user-service";
+import { fetchHistorial } from "../lib/historial-service"; // Importamos el servicio
 
 // Componente auxiliar para mostrar datos en modo lectura
 const ProfileItem = ({ icon: Icon, label, value }: { icon: any, label: string, value: string | undefined }) => (
@@ -58,6 +63,9 @@ function Profile() {
     const [success, setSuccess] = useState(false)
     const [error, setError] = useState("")
 
+    // Estado para guardar la URL del expediente (Google Drive)
+    const [fileUrl, setFileUrl] = useState<string | null>(null);
+
     // Datos del formulario
     const [formData, setFormData] = useState({
         nombreCompleto: "",
@@ -77,6 +85,13 @@ function Profile() {
                 telefono2: user.telefono2 ?? "",
                 telefono3: user.telefono3 ?? "",
                 fechaNacimiento: user.fechaNacimiento ?? "",
+            });
+
+            // --- NUEVO: Verificar si tiene archivo adjunto ---
+            fetchHistorial(user.id).then(data => {
+                if (data && data.urlExpediente) {
+                    setFileUrl(data.urlExpediente);
+                }
             });
         }
     }, [user]);
@@ -112,12 +127,11 @@ function Profile() {
                 setError(result.error);
                 return;
             }
-           
+            
             setUser(result);
             setSuccess(true);
             setIsEditing(false);
             
-            // Ocultar mensaje de éxito después de 3 segundos
             setTimeout(() => setSuccess(false), 3000);
 
         } catch (err) {
@@ -142,6 +156,13 @@ function Profile() {
         setError("");
     };
 
+    // Función para abrir el enlace de Google Drive
+    const handleDownload = () => {
+        if (fileUrl) {
+            window.open(fileUrl, "_blank");
+        }
+    };
+
     return (
         <div className="min-h-screen bg-slate-50/50">
             <NavbarLog />
@@ -162,10 +183,26 @@ function Profile() {
                         
                         <div className="text-center md:text-left flex-1">
                             <h1 className="text-3xl font-bold mb-1">{user?.nombreCompleto}</h1>
-                            <p className="text-blue-100 flex items-center justify-center md:justify-start gap-2">
-                                <CreditCard size={16} />
-                                <span>Expediente: {user?.numExpediente || "Sin asignar"}</span>
-                            </p>
+                            <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
+                                {/* Badge Expediente */}
+                                <div className="flex items-center gap-1.5 bg-blue-700/40 px-3 py-1 rounded-full text-sm border border-blue-400/30 backdrop-blur-sm">
+                                    <CreditCard size={14} className="text-blue-100" />
+                                    <span className="font-medium text-blue-50">Exp: {user?.numExpediente || "Sin asignar"}</span>
+                                </div>
+
+                                {/* Badge Afiliado */}
+                                {user?.afiliado ? (
+                                    <div className="flex items-center gap-1.5 bg-green-500/30 px-3 py-1 rounded-full text-sm border border-green-400/40 backdrop-blur-sm">
+                                        <CheckCircle2 size={14} className="text-green-200" />
+                                        <span className="font-semibold text-green-50">Paciente Afiliado</span>
+                                    </div>
+                                ) : (
+                                    <div className="flex items-center gap-1.5 bg-white/20 px-3 py-1 rounded-full text-sm border border-white/20 backdrop-blur-sm">
+                                        <Shield size={14} className="text-blue-100" />
+                                        <span className="font-medium text-blue-50">Consulta Particular</span>
+                                    </div>
+                                )}
+                            </div>
                         </div>
 
                         {!isEditing && (
@@ -380,6 +417,65 @@ function Profile() {
                     </div>
 
                     <div className="space-y-6">
+                        
+                        {/* --- TARJETA: HISTORIAL MÉDICO (Con Botón de Descarga) --- */}
+                        <Card className="bg-white border-l-4 border-l-blue-500 shadow-sm hover:shadow-md transition-shadow group cursor-pointer overflow-hidden relative">
+                            <CardContent className="p-5">
+                                <div className="flex items-start justify-between relative z-10">
+                                    <div>
+                                        <h3 className="font-bold text-slate-800 flex items-center gap-2 mb-1">
+                                            <ClipboardList className="text-blue-600 h-5 w-5" />
+                                            Historial Médico
+                                        </h3>
+                                        <p className="text-sm text-slate-500 max-w-[200px]">
+                                            Gestiona tus antecedentes y descarga tu expediente.
+                                        </p>
+                                    </div>
+                                    <div className="bg-blue-50 p-2 rounded-full group-hover:bg-blue-100 transition-colors">
+                                        <ChevronRight className="text-blue-600 h-5 w-5" />
+                                    </div>
+                                </div>
+                                
+                                <div className="mt-4 flex gap-2">
+                                    {/* Botón para Ir al Historial */}
+                                    <Link to="/historial" className="flex-1">
+                                        <Button 
+                                            variant="outlined" 
+                                            fullWidth 
+                                            sx={{ 
+                                                textTransform: 'none', 
+                                                borderColor: '#93c5fd', // blue-300
+                                                color: '#2563eb',       // blue-600
+                                                '&:hover': { borderColor: '#3b82f6', backgroundColor: '#eff6ff' }
+                                            }}
+                                        >
+                                            Ver / Editar
+                                        </Button>
+                                    </Link>
+
+                                    {/* Botón de Descarga (Google Drive) */}
+                                    <Button 
+                                        variant="contained"
+                                        onClick={handleDownload}
+                                        disabled={!fileUrl} // Se deshabilita si no hay link
+                                        title={fileUrl ? "Descargar expediente externo" : "Expediente no disponible aún"}
+                                        sx={{ 
+                                            minWidth: '50px', 
+                                            backgroundColor: '#eff6ff', 
+                                            color: '#2563eb',           
+                                            boxShadow: 'none',
+                                            '&:hover': { backgroundColor: '#dbeafe', boxShadow: 'none' },
+                                            '&:disabled': { backgroundColor: '#f1f5f9', color: '#cbd5e1' }
+                                        }}
+                                    >
+                                        <Download size={20} />
+                                    </Button>
+                                </div>
+                            </CardContent>
+                            <div className="absolute top-0 right-0 -mt-4 -mr-4 w-20 h-20 bg-blue-50 rounded-full blur-2xl opacity-50 group-hover:opacity-100 transition-opacity"></div>
+                        </Card>
+                        {/* ----------------------------------------------------- */}
+
                         <Card className="bg-slate-50 border-slate-200 shadow-sm">
                             <CardHeader className="pb-3">
                                 <CardTitle className="text-base font-semibold flex items-center gap-2 text-slate-700">

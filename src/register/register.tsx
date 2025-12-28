@@ -26,7 +26,8 @@ import {
   FileText,
   Shield,
   Loader2,
-  ArrowRight
+  ArrowRight,
+  CheckCircle2 // Importamos un icono para decorar
 } from "lucide-react";
 
 export default function Register() {
@@ -41,7 +42,8 @@ export default function Register() {
     telefono3: "",
     rfc: "",
     direccion: "",
-    fechaNacimiento: ""
+    fechaNacimiento: "",
+    afiliado: false // CAMBIO: Lo inicializamos como booleano (false)
   });
 
   const [loading, setLoading] = useState(false);
@@ -53,12 +55,20 @@ export default function Register() {
   const mostrarError = (mensaje: string) => setErrorModal({ abierto: true, mensaje });
   const cerrarError = () => setErrorModal({ abierto: false, mensaje: "" });
 
+  // CAMBIO: Lógica actualizada para manejar Checkbox
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.name === "curp" || e.target.name === "rfc" 
-      ? e.target.value.toUpperCase() 
-      : e.target.value;
+    const { name, value, type, checked } = e.target;
 
-    setFormData((prev) => ({ ...prev, [e.target.name]: value }));
+    let finalValue: string | boolean = value;
+
+    // Si es checkbox, usamos 'checked', si es texto, usamos 'value'
+    if (type === "checkbox") {
+        finalValue = checked;
+    } else if (name === "curp" || name === "rfc") {
+        finalValue = value.toUpperCase();
+    }
+
+    setFormData((prev) => ({ ...prev, [name]: finalValue }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -76,10 +86,11 @@ export default function Register() {
     setLoading(true);
 
     try {
+      // Nota: Asegúrate de que tu backend reciba 'afiliado' como booleano
       const success = await registerUser(formData);
       if (success) { 
         setUser(success);
-        navigate("/board");
+        navigate("/historial");
       } else {
         mostrarError("El CURP o número de expediente ya está registrado.");
       }
@@ -183,6 +194,24 @@ export default function Register() {
                     </div>
                 </div>
               </div>
+
+              {/* --- NUEVA SECCIÓN: CHECKBOX DE AFILIADO --- */}
+              <div className="flex items-center space-x-3 p-4 border border-blue-100 bg-blue-50/50 rounded-lg">
+                <input
+                    type="checkbox"
+                    id="afiliado"
+                    name="afiliado"
+                    checked={Boolean(formData.afiliado)}
+                    onChange={handleChange}
+                    disabled={loading}
+                    className="h-5 w-5 rounded border-slate-300 text-primary focus:ring-primary cursor-pointer accent-blue-600"
+                />
+                <Label htmlFor="afiliado" className="text-sm font-medium text-slate-700 cursor-pointer flex items-center gap-2">
+                   <CheckCircle2 size={16} className="text-blue-600"/>
+                   Soy paciente afiliado / cuento con seguro
+                </Label>
+              </div>
+              {/* ------------------------------------------ */}
 
               <Button type="submit" variant="contained" className="w-full h-11" disabled={loading} sx={{ textTransform: 'none', fontSize: '1rem' }}>
                 {loading ? (

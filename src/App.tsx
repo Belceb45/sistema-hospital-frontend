@@ -7,10 +7,13 @@ import Board from './dashboard/Board';
 import Citas from './citas/cita'
 import Nueva from './citas/new/nueva'
 import Profile from './profile/profile';
+import Resultados from './lab/resultados';
+import Footer from './components/Footer';
+import Historial from './profile/historial';
 function App() {
 
   return (
-    <>
+    <div className='flex flex-col min-h-screen'>
       <Routes>
         <Route path='/' element={<Home></Home>}></Route>
         <Route path='/register' element={<Register></Register>}></Route>
@@ -21,11 +24,17 @@ function App() {
           <Route path='/board' element={<Board />} />
           <Route path='/citas' element={<Citas />} />
           <Route path='/citas/nueva' element={<Nueva />} />
-          <Route path='/profile' element={<Profile/>}/>
+          <Route path='/profile' element={<Profile />} />
+          <Route path='/resultados' element={<Resultados/>} />
+          <Route path='/historial' element={<Historial/>}/>
         </Route>
 
       </Routes>
-    </>
+      <Footer></Footer>
+
+    </div>
+
+
   )
 }
 

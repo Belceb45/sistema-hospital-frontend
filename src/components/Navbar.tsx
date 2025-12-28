@@ -2,11 +2,12 @@ import { Activity } from "lucide-react";
 import { Link } from "react-router-dom";
 import Button from "@mui/material/Button";
 
+
 function Navbar() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-slate-200 bg-white/80 backdrop-blur-md supports-[backdrop-filter]:bg-white/60">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        
+    
       
         <Link to="/" className="flex items-center gap-2 group">
           <div className="bg-primary/10 p-2 rounded-xl group-hover:bg-primary group-hover:text-white transition-all duration-300">
