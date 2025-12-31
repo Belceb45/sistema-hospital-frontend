@@ -14,7 +14,6 @@ import {
     AlertCircle 
 } from "lucide-react";
 import type { ResultadoLab } from "../types/resultados";
-// Definimos la interfaz aquí o impórtala de tus types
 
 
 export default function Resultados() {
@@ -27,8 +26,7 @@ export default function Resultados() {
         if (user?.id) {
             fetchResultadosPaciente(user.id)
                 .then(data => {
-                    // Mapeamos los datos para enriquecer la UI
-                    // Si tiene urlArchivo -> Completado, si no -> En proceso/Pendiente
+                  
                     const datosEnriquecidos = data.map((item: any) => ({
                         ...item,
                         status: item.urlArchivo ? "completed" : "pending"
@@ -39,22 +37,19 @@ export default function Resultados() {
         }
     }, [user]);
 
-    // Filtros
+    
     const completedResults = resultados.filter(r => r.status === "completed");
     const pendingResults = resultados.filter(r => r.status !== "completed");
     
-    // Decidir qué mostrar según el tab
     const displayedResults = activeTab === "all" 
         ? resultados 
         : activeTab === "completed" 
             ? completedResults 
             : pendingResults;
 
-    // --- SUBCOMPONENTE DE TARJETA ---
     const ResultCard = ({ result }: { result: ResultadoLab }) => {
         const isCompleted = result.status === "completed";
         
-        // Configuración visual según estado
         const config = isCompleted ? {
             icon: CheckCircle2,
             color: "text-green-600",
@@ -102,7 +97,7 @@ export default function Resultados() {
                             </div>
                         </div>
 
-                        {/* Badge de Estado */}
+                  
                         <span className={`px-3 py-1 rounded-full text-xs font-semibold ${config.bgColor} ${config.color}`}>
                             {config.label}
                         </span>
@@ -120,7 +115,7 @@ export default function Resultados() {
                         </div>
                     </div>
 
-                    {/* Botón de Acción (Descargar) */}
+                   
                     {isCompleted && result.urlArchivo && (
                         <div className="mt-4 flex justify-end">
                             <button
@@ -143,7 +138,6 @@ export default function Resultados() {
             <NavbarLog />
             
             <main className="container mx-auto px-4 py-8 max-w-5xl">
-                {/* Header */}
                 <div className="mb-8">
                     <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight mb-2">
                         Resultados de Laboratorio
@@ -153,7 +147,6 @@ export default function Resultados() {
                     </p>
                 </div>
 
-                {/* Summary Cards (Contadores) */}
                 <div className="grid md:grid-cols-3 gap-4 mb-8">
                     <div className="bg-white p-5 rounded-xl border border-slate-200 shadow-sm flex items-center gap-4">
                         <div className="p-3 bg-green-100 rounded-full">
@@ -186,7 +179,6 @@ export default function Resultados() {
                     </div>
                 </div>
 
-                {/* Tabs de Navegación */}
                 <div className="bg-slate-100 p-1 rounded-xl inline-flex mb-6 w-full md:w-auto">
                     {(['all', 'completed', 'pending'] as const).map((tab) => (
                         <button
@@ -227,7 +219,7 @@ export default function Resultados() {
                     </div>
                 )}
 
-                {/* Nota Informativa Footer */}
+              
                 <div className="mt-8 bg-blue-50 border border-blue-100 rounded-xl p-4 flex gap-3 items-start">
                     <AlertCircle className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
                     <div>

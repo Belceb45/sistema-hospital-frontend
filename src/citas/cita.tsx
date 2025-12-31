@@ -121,31 +121,28 @@ export default function Citas() {
     }
   }, [user, userLoading]);
 
-  // --- LÓGICA DE CANCELACIÓN ---
   const handleCancelClick = (id: string) => {
     setSelectedAppointment(id)
     setCancelDialogOpen(true)
   }
 
-  // --- NUEVA LÓGICA DE REAGENDAR CON RESTRICCIÓN DE 2 HORAS ---
   const handleReagendarClick = (appointment: AppointmentUI) => {
-    const fechaCita = new Date(appointment.fecha); // "YYYY-MM-DDTHH:MM"
+    const fechaCita = new Date(appointment.fecha); 
     const ahora = new Date();
 
-    // Calculamos la diferencia en milisegundos
+  
     const diferenciaMs = fechaCita.getTime() - ahora.getTime();
     
-    // Convertimos a horas (ms / 1000 / 60 / 60)
+  
     const horasRestantes = diferenciaMs / (1000 * 60 * 60);
 
-    // Verificamos si faltan menos de 2 horas
+  
     if (horasRestantes < 2) {
       
         alert("\n\nSolo se permiten cambios con al menos 2 horas de anticipación a la cita.");
         return;
     }
 
-    // Si pasa la validación, navegamos
     navigate("/citas/nueva", { state: { idCitaParaReagendar: appointment.id } });
   }
 
@@ -202,7 +199,7 @@ export default function Citas() {
 
   const AppointmentCard = ({ appointment }: { appointment: AppointmentUI }) => {
     
-    // Calculamos visualmente si es posible reagendar para deshabilitar el botón (Opcional, pero recomendado UX)
+    
     const esReagendable = () => {
         const fechaCita = new Date(appointment.fecha);
         const ahora = new Date();
@@ -257,10 +254,10 @@ export default function Citas() {
                     <Button 
                         variant="contained" 
                         size="small" 
-                        // Pasamos todo el objeto appointment
+                  
                         onClick={() => handleReagendarClick(appointment)}
                         startIcon={<Edit className="h-4 w-4" />}
-                        // Opcional: Cambiar estilo si ya no se puede reagendar
+                   
                         disabled={!esReagendable()} 
                         sx={{ textTransform: 'none', boxShadow: 'none' }}
                         title={!esReagendable() ? "Solo se puede reagendar con 2 horas de anticipación" : ""}

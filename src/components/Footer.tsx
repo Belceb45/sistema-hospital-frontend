@@ -12,15 +12,14 @@ import {
 
 export default function Footer() {
   return (
-    // CAMBIO: Usamos blue-800 (Azul rey oscuro) en lugar de 950.
-    // Los bordes ahora son blue-700 para que se noten sutilmente.
+  
     <footer className="bg-primary text-white pt-16 pb-8 border-t border-blue-700">
       <div className="container mx-auto px-4">
         
-        {/* --- GRID SUPERIOR --- */}
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
           
-          {/* Columna 1: Marca y Slogan */}
+     
           <div className="space-y-4">
             <div className="flex items-center gap-2 text-white text-xl font-bold">
               <div className="bg-blue-470 p-2 rounded-lg shadow-md border border-blue-500">
@@ -38,7 +37,7 @@ export default function Footer() {
             </div>
           </div>
 
-          {/* Columna 2: Enlaces Rápidos */}
+       
           <div>
             <h3 className="font-bold mb-6 text-blue-200 uppercase tracking-wider text-xs">Navegación</h3>
             <ul className="space-y-3 text-sm font-medium">
@@ -65,7 +64,7 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Columna 3: Soporte */}
+
           <div>
             <h3 className="font-bold mb-6 text-blue-200 uppercase tracking-wider text-xs">Soporte</h3>
             <ul className="space-y-3 text-sm font-medium">
@@ -75,7 +74,6 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Columna 4: Contacto */}
           <div>
             <h3 className="font-bold mb-6 text-blue-200 uppercase tracking-wider text-xs">Contacto</h3>
             <ul className="space-y-4 text-sm">
@@ -99,7 +97,7 @@ export default function Footer() {
 
         </div>
 
-        {/* --- BARRA INFERIOR --- */}
+     
         <div className="border-t border-blue-700 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-blue-200">
           <p>© {new Date().getFullYear()} Hospital System. Todos los derechos reservados.</p>
           <div className="flex gap-6 font-medium">

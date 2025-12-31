@@ -28,7 +28,7 @@ export default function NavbarLog() {
   useEffect(() => {
     if (user?.id) {
       cargarNotificaciones();
-      const interval = setInterval(cargarNotificaciones, 30000); // Actualiza cada 30s
+      const interval = setInterval(cargarNotificaciones, 30000); 
       return () => clearInterval(interval);
     }
   }, [user?.id]);
@@ -48,7 +48,7 @@ export default function NavbarLog() {
     try {
       const data = await fetchNotificaciones(user.id);
       setNotificaciones(data);
-      // CORRECCIÓN: Usamos 'leida' en lugar de 'estado'
+ 
       setUnreadCount(data.filter(n => !n.leida).length);
     } catch (error) {
       console.error("Error cargando notificaciones");
@@ -57,11 +57,11 @@ export default function NavbarLog() {
 
   const handleMarcarLeida = async (id: string) => {
     await marcarLeida(id);
-    // CORRECCIÓN: Aquí ya lo tenías bien (leida: true)
+    
     setNotificaciones(prev => prev.map(n => n.id === id ? { ...n, leida: true } : n));
     setUnreadCount(prev => Math.max(0, prev - 1));
   };
-  // -------------------------------
+  
 
   const handleLogout = () => {
     logout();
@@ -121,7 +121,7 @@ export default function NavbarLog() {
         <div className="flex items-center gap-3 md:gap-4 ml-4">
           <div className="flex items-center gap-4">
 
-            {/* === CAMPANA DE NOTIFICACIONES === */}
+          
             <div className="relative" ref={notiRef}>
               <button
                 onClick={() => setShowNotis(!showNotis)}
@@ -133,7 +133,6 @@ export default function NavbarLog() {
                 )}
               </button>
 
-              {/* DROPDOWN DESPLEGABLE */}
               {showNotis && (
                 <div className="absolute right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-slate-100 overflow-hidden animate-in fade-in slide-in-from-top-2 z-50">
                   <div className="p-3 border-b bg-slate-50 flex justify-between items-center">
@@ -152,13 +151,11 @@ export default function NavbarLog() {
                       notificaciones.map((noti) => (
                         <div
                           key={noti.id}
-                          // CORRECCIÓN: Usamos 'leida'
                           onClick={() => !noti.leida && handleMarcarLeida(noti.id)}
                           className={`p-3 border-b border-slate-50 hover:bg-slate-50 transition-colors cursor-pointer relative
                                             ${!noti.leida ? 'bg-blue-50/50' : 'opacity-70'}
                                         `}
                         >
-                          {/* CORRECCIÓN: Usamos 'leida' */}
                           {!noti.leida && (
                             <div className="absolute top-4 right-3 h-2 w-2 bg-blue-500 rounded-full"></div>
                           )}

@@ -55,13 +55,12 @@ export default function Register() {
   const mostrarError = (mensaje: string) => setErrorModal({ abierto: true, mensaje });
   const cerrarError = () => setErrorModal({ abierto: false, mensaje: "" });
 
-  // CAMBIO: Lógica actualizada para manejar Checkbox
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
 
     let finalValue: string | boolean = value;
 
-    // Si es checkbox, usamos 'checked', si es texto, usamos 'value'
     if (type === "checkbox") {
         finalValue = checked;
     } else if (name === "curp" || name === "rfc") {
@@ -86,7 +85,7 @@ export default function Register() {
     setLoading(true);
 
     try {
-      // Nota: Asegúrate de que tu backend reciba 'afiliado' como booleano
+      
       const success = await registerUser(formData);
       if (success) { 
         setUser(success);
@@ -195,7 +194,7 @@ export default function Register() {
                 </div>
               </div>
 
-              {/* --- NUEVA SECCIÓN: CHECKBOX DE AFILIADO --- */}
+            
               <div className="flex items-center space-x-3 p-4 border border-blue-100 bg-blue-50/50 rounded-lg">
                 <input
                     type="checkbox"
@@ -211,7 +210,7 @@ export default function Register() {
                    Soy paciente afiliado / cuento con seguro
                 </Label>
               </div>
-              {/* ------------------------------------------ */}
+           
 
               <Button type="submit" variant="contained" className="w-full h-11" disabled={loading} sx={{ textTransform: 'none', fontSize: '1rem' }}>
                 {loading ? (

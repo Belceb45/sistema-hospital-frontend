@@ -15,7 +15,6 @@ import {
   CardContent,
 } from "../components/ui/card";
 
-// Iconos (Agregamos FileText)
 import { 
   Calendar, 
   User, 
@@ -25,10 +24,9 @@ import {
   Stethoscope, 
   ArrowRight,
   Map,
-  FileText // <--- IMPORTADO
+  FileText
 } from "lucide-react";
 
-// Tipo auxiliar extendido para la UI
 interface CitaExtendida extends Cita {
   doctorNombre?: string;
   doctorEspecialidad?: string;
@@ -50,14 +48,12 @@ function Board() {
           const hoy = new Date();
           hoy.setHours(0, 0, 0, 0);
 
-          // Filtrar activas
           const citasActivas = data.filter((c) => {
              const fechaCita = new Date(`${c.fecha}T${c.hora}`);
              const estado = c.estado ? c.estado.toLowerCase() : "";
              return estado !== "cancelada" && fechaCita >= hoy;
           });
 
-          // ENRIQUECER CON DATOS DEL DOCTOR ESPECÍFICO
           const uniqueDocIds = Array.from(new Set(citasActivas.map(c => c.doctor)));
           
           const docsMap: Record<string, {nombre: string, especialidad: string}> = {};
@@ -103,7 +99,6 @@ function Board() {
 
       <main className="container mx-auto px-4 py-8 max-w-6xl animate-in fade-in slide-in-from-bottom-4 duration-700">
         
-        {/* --- HERO SECTION --- */}
         <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-primary/10 via-primary/5 to-background border border-border p-8 mb-8">
           <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
             <div>
@@ -130,10 +125,8 @@ function Board() {
           <div className="absolute top-0 right-0 -mt-10 -mr-10 w-64 h-64 bg-primary/10 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
         </div>
 
-        {/* --- DASHBOARD GRID --- */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           
-          {/* COLUMNA IZQUIERDA (2/3) */}
           <div className="lg:col-span-2 space-y-8">
             
           

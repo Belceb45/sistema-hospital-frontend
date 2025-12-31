@@ -29,7 +29,7 @@ import {
     AlertCircle, 
     RefreshCw,
     Wallet,
-    FileHeart // Nuevo icono para el aviso de historial
+    FileHeart 
 } from "lucide-react";
 
 import {
@@ -39,7 +39,7 @@ import {
   reagendarCita 
 } from "../../lib/citas-service";
 
-// IMPORTANTE: Importamos el servicio de historial para verificar
+//
 import { fetchHistorial } from "../../lib/historial-service";
 
 import type { Cita } from "../../types/cita";
@@ -63,7 +63,7 @@ export default function Nueva() {
   const [loadingAgendar, setLoadingAgendar] = useState(false);
   const [tieneCitaActiva, setTieneCitaActiva] = useState(false);
   
-  // Estado para bloquear si falta historial
+
   const [faltaHistorial, setFaltaHistorial] = useState(false);
 
   const [msg, setMsg] = useState<{ type: "success" | "error" | "warning" | ""; text: string }>({
@@ -71,7 +71,6 @@ export default function Nueva() {
     text: ""
   });
 
-  // --- LÓGICA DE PRECIOS ---
   const costoConsulta = useMemo(() => {
     if (user?.afiliado) return 0;
     if (doctor?.especialidad) {
@@ -89,7 +88,7 @@ export default function Nueva() {
     const inicializar = async () => {
       setLoadingData(true);
       try {
-        // --- 1. VERIFICACIÓN DE HISTORIAL (CANDADO) ---
+ 
         const historialMedico = await fetchHistorial(user.id);
         
         if (!historialMedico) {
@@ -99,12 +98,12 @@ export default function Nueva() {
                 text: "Requisito: Debes completar tu Historial Médico antes de agendar una cita." 
             });
             
-            // Redirigir automáticamente después de 3 segundos
+            
             setTimeout(() => {
                 navigate("/historial");
             }, 3000);
             
-            return; // Detenemos la carga aquí, no permitimos ver citas
+            return; 
         }
         // ----------------------------------------------
 
@@ -138,7 +137,7 @@ export default function Nueva() {
   }, [user?.id, navigate, esReagendado]);
 
   const horariosDelDia = useMemo(() => {
-    // Agregamos faltaHistorial a las condiciones de bloqueo
+    // faltaHistorial a las condiciones de bloqueo
     if (!selectedDate || (tieneCitaActiva && !esReagendado) || faltaHistorial) return []; 
     const fechaFormat = selectedDate.format("YYYY-MM-DD");
     return todasLasCitas.filter(c => {
