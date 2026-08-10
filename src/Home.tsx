@@ -19,7 +19,6 @@ import {
 import { Link } from "react-router-dom";
 import Button from "@mui/material/Button";
 import Snowfall from 'react-snowfall'
-import logoEscom from "../public/logoEscom.png"; 
 
 function Home() {
   return (
@@ -155,45 +154,6 @@ function Home() {
         </div>
 
       </main>
-
-      <footer className="border-t border-slate-100 bg-slate-50 py-12">
-        <div className="container mx-auto px-4">
-            
-       
-            <div className="grid grid-cols-1 md:grid-cols-3 items-center gap-8">
-                
-              
-                <div className="hidden md:block"></div>
-
-                <div className="text-center">
-                    <div className="flex justify-center items-center gap-2 mb-4 text-slate-800 font-bold text-xl">
-                        <Activity className="text-primary" /> Portal Pacientes
-                    </div>
-                    <p className="text-slate-500 text-sm mb-4">
-                        Comprometidos con tu bienestar y privacidad.
-                    </p>
-                    <div className="flex justify-center gap-6 text-sm text-slate-400">
-                        <a href="#" className="hover:text-primary transition-colors">Términos</a>
-                        <a href="#" className="hover:text-primary transition-colors">Privacidad</a>
-                        <a href="#" className="hover:text-primary transition-colors">Ayuda</a>
-                    </div>
-                    <p className="text-xs text-slate-300 mt-6">
-                        &copy; 2025 Portal de Pacientes. Todos los derechos reservados.
-                    </p>
-                </div>
-
-                <div className="flex flex-col items-center md:items-end">
-                    <span className="text-[10px] text-slate-400 mb-1 uppercase tracking-wider font-semibold">Desarrollado por</span>
-                    <img 
-                        src={logoEscom} 
-                        alt="Logo ESCOM" 
-                        className="h-16 w-auto opacity-90 hover:opacity-100 transition-opacity" 
-                    />
-                </div>
-
-            </div>
-        </div>
-      </footer>
     </div>
   );
 }

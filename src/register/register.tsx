@@ -27,7 +27,8 @@ import {
   Shield,
   Loader2,
   ArrowRight,
-  CheckCircle2 // Importamos un icono para decorar
+  CheckCircle2,
+  ShieldAlert // Icono para resaltar la sección legal
 } from "lucide-react";
 
 export default function Register() {
@@ -43,7 +44,8 @@ export default function Register() {
     rfc: "",
     direccion: "",
     fechaNacimiento: "",
-    afiliado: false // CAMBIO: Lo inicializamos como booleano (false)
+    afiliado: false,
+    aceptarAviso: false // NUEVO: Consentimiento obligatorio Ley 2025
   });
 
   const [loading, setLoading] = useState(false);
@@ -55,10 +57,8 @@ export default function Register() {
   const mostrarError = (mensaje: string) => setErrorModal({ abierto: true, mensaje });
   const cerrarError = () => setErrorModal({ abierto: false, mensaje: "" });
 
-
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, type, checked } = e.target;
-
     let finalValue: string | boolean = value;
 
     if (type === "checkbox") {
@@ -73,6 +73,12 @@ export default function Register() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // VALIDACIÓN LEGAL: Consentimiento para datos sensibles
+    if (!formData.aceptarAviso) {
+      mostrarError("Debe aceptar el Aviso de Privacidad para proceder con el manejo de sus datos de salud.");
+      return;
+    }
+
     if (!validarCurp(formData.curp)) {
       mostrarError("El formato del CURP no es válido.");
       return;
@@ -85,7 +91,7 @@ export default function Register() {
     setLoading(true);
 
     try {
-      
+      // Se envía 'aceptarAviso' al backend para la bitácora de auditoría legal
       const success = await registerUser(formData);
       if (success) { 
         setUser(success);
@@ -113,13 +119,14 @@ export default function Register() {
           <CardHeader className="space-y-1 text-center pb-6 border-b bg-slate-50/50">
             <CardTitle className="text-2xl">Crear Cuenta</CardTitle>
             <CardDescription>
-              Ingresa tus datos personales para registrarte en el sistema.
+              Tus datos están protegidos bajo la normativa vigente de salud.
             </CardDescription>
           </CardHeader>
 
           <CardContent className="pt-6">
             <form onSubmit={handleSubmit} className="space-y-6">
               
+              {/* --- DATOS PERSONALES --- */}
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-2 md:col-span-2">
                     <Label htmlFor="nombreCompleto">Nombre Completo *</Label>
@@ -176,6 +183,7 @@ export default function Register() {
                 </div>
               </div>
 
+              {/* --- CONTACTOS EMERGENCIA --- */}
               <div className="p-4 bg-slate-50 rounded-lg border border-slate-100">
                 <p className="text-sm font-medium text-slate-700 mb-3 flex items-center gap-2">
                     <Shield className="h-3 w-3" /> Contactos de Emergencia
@@ -194,7 +202,7 @@ export default function Register() {
                 </div>
               </div>
 
-            
+              {/* --- SECCIÓN AFILIADO --- */}
               <div className="flex items-center space-x-3 p-4 border border-blue-100 bg-blue-50/50 rounded-lg">
                 <input
                     type="checkbox"
@@ -210,9 +218,42 @@ export default function Register() {
                    Soy paciente afiliado / cuento con seguro
                 </Label>
               </div>
-           
 
-              <Button type="submit" variant="contained" className="w-full h-11" disabled={loading} sx={{ textTransform: 'none', fontSize: '1rem' }}>
+              {/* --- NUEVO: CONSENTIMIENTO AVISO DE PRIVACIDAD (LEY 2025) --- */}
+              <div className="p-4 bg-amber-50/50 border-2 border-amber-100 rounded-lg space-y-3">
+                <div className="flex items-start gap-3">
+                    <input
+                        type="checkbox"
+                        id="aceptarAviso"
+                        name="aceptarAviso"
+                        required
+                        checked={formData.aceptarAviso}
+                        onChange={handleChange}
+                        disabled={loading}
+                        className="mt-1 h-5 w-5 rounded border-amber-300 text-amber-600 focus:ring-amber-500 cursor-pointer"
+                    />
+                    <div className="space-y-1">
+                        <Label htmlFor="aceptarAviso" className="text-sm font-bold text-slate-800 cursor-pointer flex items-center gap-2">
+                           <ShieldAlert size={16} className="text-amber-600"/> Consentimiento de Datos Sensibles
+                        </Label>
+                        <p className="text-xs text-slate-600 leading-relaxed">
+                            Acepto que mis datos de salud sean tratados para la integración de mi expediente clínico conforme a la 
+                            <b> NOM-004-SSA3-2012</b> y la <b>Ley Federal de Protección de Datos (Ref. 2025)</b>. He leído el 
+                            <Link to="/avisoprivacidad" target="_blank" className="text-primary font-semibold hover:underline mx-1">
+                                Aviso de Privacidad Integral
+                            </Link>.
+                        </p>
+                    </div>
+                </div>
+              </div>
+
+              <Button 
+                type="submit" 
+                variant="contained" 
+                className="w-full h-11" 
+                disabled={loading || !formData.aceptarAviso} 
+                sx={{ textTransform: 'none', fontSize: '1rem' }}
+              >
                 {loading ? (
                     <span className="flex items-center gap-2"><Loader2 className="animate-spin h-4 w-4"/> Creando cuenta...</span>
                 ) : (
