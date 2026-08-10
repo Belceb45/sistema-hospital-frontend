@@ -4,7 +4,7 @@ import { useUser } from "../lib/user-context"
 import NavbarLog from "../components/NavbarLog" 
 import { fetchCitasPaciente, cancelarCita, fetchDoctorAsignado } from "../lib/citas-service"
 import { updateDoctor } from "../lib/user-service" 
-import type { Cita } from "../types/cita"
+
 
 import Button from "@mui/material/Button"
 import { Card, CardContent } from "../components/ui/card"

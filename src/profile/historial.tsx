@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useUser } from "../lib/user-context";
 import NavbarLog from "../components/NavbarLog";
 import { fetchHistorial, guardarHistorial } from "../lib/historial-service";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { 
     Activity, 
     Users, 
@@ -12,10 +12,8 @@ import {
     Clock,
     Syringe,
     Droplet,
-    CheckCircle2, 
-    AlertCircle,
-    Download, // Icono necesario
-    FileText 
+    CheckCircle2,
+    Download // Icono necesario
 } from "lucide-react";
 
 import { Card } from "../components/ui/card";
@@ -35,8 +33,7 @@ const SECCIONES = [
 
 export default function Historial() {
     const { user } = useUser();
-    const navigate = useNavigate();
-    
+
     const [activeTab, setActiveTab] = useState('patologicos');
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);

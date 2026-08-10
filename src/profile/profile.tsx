@@ -1,6 +1,6 @@
 import type React from "react"
 import { useEffect, useState } from "react"
-import { useNavigate, Link } from "react-router-dom"
+import { Link } from "react-router-dom"
 
 import {
     Card,
@@ -27,8 +27,7 @@ import {
     Shield,
     ClipboardList,
     ChevronRight,
-    Download, // Icono para descargar
-    ExternalLink
+    Download // Icono para descargar
 } from "lucide-react"
 
 import { Input } from "../components/ui/input";
@@ -56,7 +55,6 @@ const ProfileItem = ({ icon: Icon, label, value }: { icon: any, label: string, v
 function Profile() {
 
     const { user, setUser } = useUser();
-    const navigate = useNavigate();
 
     const [isEditing, setIsEditing] = useState(false)
     const [loading, setLoading] = useState(false)

@@ -23,9 +23,9 @@ import {
     Calendar, 
     ArrowLeft, 
     Loader2, 
-    CheckCircle2, 
+   
     User, 
-    Stethoscope, 
+  
     AlertCircle, 
     RefreshCw,
     Wallet,

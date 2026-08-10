@@ -1,10 +1,9 @@
-import { Routes, Route, Outlet, useLocation, Navigate } from 'react-router-dom'
-import { useEffect } from 'react'
+import { Routes, Route, Outlet, Navigate } from 'react-router-dom'
 import Home from './Home';
 import Register from './register/register';
 import Login from './login/login';
 import PrivateRoute from './lib/privateRoute';
-import Board from './dashboard/board';
+import Board from './dashboard/Board';
 import Citas from './citas/cita'
 import Nueva from './citas/new/nueva'
 import Profile from './profile/profile';
